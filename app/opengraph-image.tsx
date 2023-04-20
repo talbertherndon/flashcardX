@@ -2,7 +2,7 @@
 import { ImageResponse } from "next/server";
 
 export const runtime = "edge";
-export const alt = "Precedent - Building blocks for your Next.js project";
+export const alt = "FlashcardX - Making studying more efficient and engaging";
 export const contentType = "image/png";
 
 export default async function OG() {
@@ -42,7 +42,7 @@ export default async function OG() {
             letterSpacing: "-0.02em",
           }}
         >
-          Precedent
+          FlashcardX
         </h1>
       </div>
     ),
