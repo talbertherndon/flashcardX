@@ -5,17 +5,17 @@ import Nav from "@/components/layout/nav";
 import Footer from "@/components/layout/footer";
 import { Suspense } from "react";
 export const metadata = {
-  title: "FlashcardX - Improving the quality of education and help make learning more efficient and engaging.",
+  title: "FlashcardX - Improving the quality of education and help make studying more efficient and engaging.",
   description:
-    "FlashcardX is the AI to help you create study material so you can ace your next test!",
+    "The future of studying is here with FlashcardX use AI to help you create study material so you can ace your next test!",
   twitter: {
     card: "summary_large_image",
-    title: "FlashcardX - Making learning more efficient and engaging.",
+    title: "FlashcardX - Making studying more efficient and engaging.",
     description:
-      "FlashcardX is the AI to help you create study material so you can ace your next test!",
+      "Say goodbye to Quizzlet ! The future of studying is here with FlashcardX use AI to help you create study material so you can ace your next test!",
     creator: "@talbertherndon",
   },
-  metadataBase: new URL("https://ai.flashcards.com"),
+  metadataBase: new URL("https://ai.flashcardX.com"),
   themeColor: "#FFF",
 };
 
