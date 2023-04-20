@@ -16,7 +16,7 @@ import { type } from "os";
 import { saveFlaschards } from "@/lib/api";
 import { Session } from "next-auth";
 import { useSignInModal } from "../layout/sign-in-modal";
-import useWindowSize from "@/lib/hooks/use-window-size";
+import { useWindowSize } from 'usehooks-ts'
 
 
 
@@ -276,7 +276,6 @@ export default function FlashcardGenerator({ session }: { session: any }) {
                                                     >
                                                         <motion.div
                                                             animate={{ y: 10, scale: 1 }}
-                                                            transition={{ delay: index }}
                                                             initial={{ scale: 0 }}
                                                         >
                                                             <div className="mx-10 max-w text-center">
