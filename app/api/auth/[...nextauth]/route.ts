@@ -12,8 +12,7 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     jwt: async ({ token, user }) => {
-      console.log("token_jwt", token);
-      console.log("tuser_jwt", user);
+
 
       const { data } = await axios
         .get(
@@ -24,14 +23,14 @@ export const authOptions: NextAuthOptions = {
           console.log(e);
           return e;
         });
-      console.log(data);
+
       token.id = data.user;
       token.token = data.authToken;
 
       return token;
     },
     session: async (res: any) => {
-      console.log(res.session);
+
       // cookie.set("j_ce_u", session.authToken);
       res.session.user = res.token.id;
       res.session.token = res.token.token;

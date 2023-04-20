@@ -13,7 +13,7 @@ import ReactCardFlip from "react-card-flip";
 import { data } from "@/lib/mock/terms";
 import Carousel from "react-material-ui-carousel";
 import { type } from "os";
-import { saveFlaschards } from "@/lib/api";
+import { generateFlaschards, saveFlaschards } from "@/lib/api";
 import { Session } from "next-auth";
 import { useSignInModal } from "../layout/sign-in-modal";
 import { useWindowSize } from 'usehooks-ts'
@@ -45,38 +45,58 @@ export default function FlashcardGenerator({ session }: { session: any }) {
     const [limit, setLimit] = useState(false);
     const [error, setError] = useState(false);
     const [word, setWord] = useState("");
+    const [loading, setLoading] = useState(false);
+
     const [progress, setProgress] = useState(0);
     const [flashcards, setFlashcards] = useState<IFlashcard[]>([]);
     const [flipped, setFlipped] = useState(false);
 
     async function generateFlashcardsHandler() {
+        setLoading(true)
         console.log(text);
-        const response = await fetch(`/flashcards`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                response: `${text}`,
-                userID: `${1}`,
-            }),
-        });
-        const data = await response.json();
-        const answers = data.answers.split("\n");
-        const questions = data.questions.split("\n");
-        for (let i = 1; i < answers.length; i++) {
-            const tempObject = {
-                definition: answers[i],
-                term: questions[i],
-            }
-            console.log(tempObject)
-            setFlashcards((prev) => [...prev, tempObject])
+        generateFlaschards(text).then((data) => {
+            console.log(data)
+            const answers = data.answers.split("\n");
+            const questions = data.questions.split("\n");
+            for (let i = 1; i < answers.length; i++) {
+                const tempObject = {
+                    definition: answers[i],
+                    term: questions[i],
+                }
+                console.log(tempObject)
+                setFlashcards((prev) => [...prev, tempObject])
 
-        }
+            }
+            setProgress(0)
+            setLoading(false)
+        })
+
     }
+
     useEffect(() => {
         setFlashcards(data);
-    }, [data]);
+    }, []);
+
+    useEffect(() => {
+        if (loading) {
+            const timer = setInterval(() => {
+                setProgress((oldProgress) => {
+                    if (oldProgress === 100) {
+                        return 0;
+                    }
+                    const diff = Math.random() * 10;
+                    return Math.min(oldProgress + diff, 100);
+                });
+            }, 500);
+
+            return () => {
+                clearInterval(timer);
+            };
+        } else {
+            setProgress(100);
+            clearInterval(0);
+        }
+    }, [loading]);
 
     function saveFlashcardHandler() {
         let x = Math.floor((Math.random() * 9999) + 1000);
@@ -177,7 +197,7 @@ export default function FlashcardGenerator({ session }: { session: any }) {
                                 Clear
                             </button>
                         </div>
-                        {progress > 0 && (
+                        {progress > 0 && loading && (
                             <BorderLinearProgress variant="determinate" value={progress} />
                         )}
                     </Box>
@@ -208,7 +228,7 @@ export default function FlashcardGenerator({ session }: { session: any }) {
                             >
                                 <Carousel
                                     height={350}
-                                    autoPlay={session ? true : false}
+                                    autoPlay={session ? false : true}
                                     stopAutoPlayOnHover={session ? true : false}
                                     animation="slide"
                                     //index={r}
@@ -232,7 +252,7 @@ export default function FlashcardGenerator({ session }: { session: any }) {
                                     }}
                                 >
                                     {flashcards.map((res: any, index: number) => (
-                                        <Box key={index}>
+                                        <Box sx={{'&:hover':{cursor:'grab'}}} key={index}>
                                             {width > 450 ?
                                                 <ReactCardFlip isFlipped={flipped} flipDirection="vertical">
                                                     <Box
