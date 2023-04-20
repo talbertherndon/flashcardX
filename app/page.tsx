@@ -101,11 +101,11 @@ export default async function Home() {
 }
 
 const features = [
-  {
-    title: "FlashcardsX",
-    description:
-      "AI can revolutionize the education industry by providing personalized learning experiences for students. AI can be used to assess student's learning capabilities and create customized content based on their individual needs. AI can also be used to generate insights from0 large data sets to improve teaching strategies and identify potential areas of improvement. AI can also help automate the grading process, freeing up time for teachers to focus on teaching. Ultimately, AI can improve the quality of education and help make learning more efficient and engaging. -ChatGPT3",
-  },
+  // {
+  //   title: "FlashcardsX",
+  //   description:
+  //     "First, find",
+  // },
   {
     title: "Generate your flashcards",
     description:
@@ -118,7 +118,7 @@ const features = [
   },
   {
     title: "My Flashcards",
-    large: true,
+
     description:
       "View your saved flashcards at any time!",
     demo: <Suspense fallback="...">
