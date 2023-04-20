@@ -3,7 +3,7 @@ import { Session } from "next-auth";
 import { useEffect, useState } from 'react';
 import { getFlaschard, getMyFlashcards } from "@/lib/api";
 
-export default function FlashcardList({ session }: { session: Session | null }) {
+export default function FlashcardList({ session }: { session: any }) {
     const [sets, setSets] = useState([])
     useEffect(() => {
         if (session) {

@@ -7,19 +7,7 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
-export async function POST(
-  req: { body: { response: any; userID: any } },
-  res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: {
-        (arg0: { questions?: string; answers?: string; error?: string }): void;
-        new (): any;
-      };
-    };
-  },
-) {
+export async function POST(req:any) {
   const user_input = req.body.response;
   const user_id = req.body.userID;
   // console.log(user_id, req.body.response);

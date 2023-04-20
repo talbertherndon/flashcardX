@@ -20,7 +20,7 @@ export const authOptions: NextAuthOptions = {
           `https://xg3n-4mh1-ngd5.n7.xano.io/api:w4ONEGEJ:v2/user_by_email?email=${token.email}`,
         )
 
-        .catch((e) => {
+        .catch((e: any) => {
           console.log(e);
           return e;
         });
@@ -47,7 +47,7 @@ export const authOptions: NextAuthOptions = {
               params: { tokenn: res.account.access_token },
             },
           )
-          .catch((e) => {
+          .catch((e: any) => {
             console.log(e);
             return e;
           });

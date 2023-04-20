@@ -36,7 +36,7 @@ interface IFlashcard {
     definition: string
 }
 
-export default function FlashcardGenerator({ session }: { session: Session | null }) {
+export default function FlashcardGenerator({ session }: { session: any }) {
     const [text, setText] = useState("");
     const [limit, setLimit] = useState(false);
     const [error, setError] = useState(false);
