@@ -118,7 +118,6 @@ const features = [
   },
   {
     title: "My Flashcards",
-
     description:
       "View your saved flashcards at any time!",
     demo: <Suspense fallback="...">
