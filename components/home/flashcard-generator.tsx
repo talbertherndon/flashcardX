@@ -15,6 +15,8 @@ import Carousel from "react-material-ui-carousel";
 import { type } from "os";
 import { saveFlaschards } from "@/lib/api";
 import { Session } from "next-auth";
+import { useSignInModal } from "../layout/sign-in-modal";
+import useWindowSize from "@/lib/hooks/use-window-size";
 
 
 
@@ -37,6 +39,8 @@ interface IFlashcard {
 }
 
 export default function FlashcardGenerator({ session }: { session: any }) {
+    const { SignInModal, setShowSignInModal } = useSignInModal();
+    const { width } = useWindowSize()
     const [text, setText] = useState("");
     const [limit, setLimit] = useState(false);
     const [error, setError] = useState(false);
@@ -44,7 +48,6 @@ export default function FlashcardGenerator({ session }: { session: any }) {
     const [progress, setProgress] = useState(0);
     const [flashcards, setFlashcards] = useState<IFlashcard[]>([]);
     const [flipped, setFlipped] = useState(false);
-    console.log(flashcards)
 
     async function generateFlashcardsHandler() {
         console.log(text);
@@ -89,6 +92,7 @@ export default function FlashcardGenerator({ session }: { session: any }) {
     }
     return (
         <div className="relative h-full w-full">
+            <SignInModal />
             {flashcards.length == 0 ? (
                 <motion.div
                     animate={{
@@ -204,99 +208,155 @@ export default function FlashcardGenerator({ session }: { session: any }) {
                             >
                                 <Carousel
                                     height={350}
-                                    autoPlay={false}
-                                    stopAutoPlayOnHover={false}
+                                    autoPlay={session ? true : false}
+                                    stopAutoPlayOnHover={session ? true : false}
                                     animation="slide"
                                     //index={r}
+                                    navButtonsAlwaysVisible={true}
                                     next={() => setFlipped(false)}
                                     prev={(prev, active) =>
                                         console.log(`we left ${active}, and are now at ${prev}`)
                                     }
+                                    navButtonsProps={{          // Change the colors and radius of the actual buttons. THIS STYLES BOTH BUTTONS
+                                        style: {
+                                            backgroundColor: 'white',
+                                            color: 'black',
+                                            borderRadius: 10
+                                        }
+                                    }}
+                                    navButtonsWrapperProps={{   // Move the buttons to the bottom. Unsetting top here to override default style.
+                                        style: {
+                                            bottom: '0',
+                                            top: 'unset'
+                                        }
+                                    }}
                                 >
                                     {flashcards.map((res: any, index: number) => (
                                         <Box key={index}>
-                                            <ReactCardFlip isFlipped={flipped} flipDirection="vertical">
-                                                <Box
-                                                    onClick={() => {
-                                                        setFlipped(!flipped);
-                                                    }}
-                                                    sx={{
-                                                        display: "flex",
-                                                        height: 350,
-                                                        alignItems: "center",
-                                                        justifyContent: "center",
-                                                        m: 1,
-                                                        borderRadius: 2,
-                                                        boxShadow: 1,
-                                                    }}
-                                                >
-                                                    <motion.div
-                                                        animate={{ y: 10, scale: 1 }}
-                                                        //   transition={{ delay: `${index}` }}
-                                                        initial={{ scale: 0 }}
+                                            {width > 450 ?
+                                                <ReactCardFlip isFlipped={flipped} flipDirection="vertical">
+                                                    <Box
+                                                        onClick={() => {
+                                                            setFlipped(!flipped);
+                                                        }}
+                                                        sx={{
+                                                            display: "flex",
+                                                            height: 350,
+                                                            alignItems: "center",
+                                                            justifyContent: "center",
+                                                            m: 1,
+                                                            borderRadius: 2,
+                                                            boxShadow: 1,
+                                                        }}
                                                     >
-                                                        <Typography
+                                                        <motion.div
+                                                            animate={{ y: 10, scale: 1 }}
+                                                            //   transition={{ delay: `${index}` }}
+                                                            initial={{ scale: 0 }}
+                                                        >
+                                                            <div className="mx-10 max-w text-center">
+                                                                <h2 className="bg-gradient-to-br from-black to-black bg-clip-text font-display text-xl font-bold text-transparent md:text-3xl md:font-normal">
+                                                                    {res.term.replace(/\d+/g, "").replace(".", "")}</h2>
+                                                            </div>
+                                                        </motion.div>
+                                                    </Box>
+                                                    <Box
+                                                        onClick={() => {
+                                                            setFlipped(!flipped);
+                                                        }}
+                                                        sx={{
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            height: 350,
+                                                            backgroundColor: "#F3F0F6",
+                                                            m: 1,
+                                                            borderRadius: 2,
+                                                            boxShadow: 1,
+                                                        }}
+                                                    >
+                                                        <motion.div
+                                                            animate={{ y: 10, scale: 1 }}
+                                                            transition={{ delay: index }}
+                                                            initial={{ scale: 0 }}
+                                                        >
+                                                            <div className="mx-10 max-w text-center">
+
+                                                                <h2 className="bg-gradient-to-br from-black to-black bg-clip-text font-display text-xl font-bold text-transparent md:text-3xl md:font-normal">
+                                                                    {/* replace() takes out dates and important times when answering questions */}
+                                                                    {res.definition}
+                                                                </h2>
+                                                            </div>
+                                                        </motion.div>
+                                                    </Box>
+                                                </ReactCardFlip> : <>
+                                                    {!flipped ?
+                                                        <Box
+                                                            onClick={() => {
+                                                                setFlipped(!flipped);
+                                                            }}
                                                             sx={{
-                                                                p: 1,
-                                                                fontWeight: 800,
-                                                                fontSize: 25,
-                                                                textAlign: "center",
-                                                                padding: 6,
+                                                                display: "flex",
+                                                                height: 350,
+                                                                alignItems: "center",
+                                                                justifyContent: "center",
+                                                                m: 1,
+                                                                borderRadius: 2,
+                                                                boxShadow: 1,
                                                             }}
                                                         >
-                                                            {res.term.replace(/\d+/g, "").replace(".", "")}
-                                                        </Typography>
-                                                    </motion.div>
-                                                </Box>
-                                                <Box
-                                                    onClick={() => {
-                                                        setFlipped(!flipped);
-                                                    }}
-                                                    sx={{
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        height: 350,
-                                                        backgroundColor: "#F3F0F6",
-                                                        m: 1,
-                                                        borderRadius: 2,
-                                                        boxShadow: 1,
-                                                    }}
-                                                >
-                                                    <motion.div
-                                                        animate={{ y: 10, scale: 1 }}
-                                                        transition={{ delay: index }}
-                                                        initial={{ scale: 0 }}
-                                                    >
-                                                        <Typography
+                                                            <div className="mx-10 max-w text-center">
+                                                                <h2 className="bg-gradient-to-br from-black to-black bg-clip-text font-display text-xl font-bold text-transparent md:text-3xl md:font-normal">
+                                                                    {res.term.replace(/\d+/g, "").replace(".", "")}</h2>
+                                                            </div>
+                                                        </Box> :
+                                                        <Box
+                                                            onClick={() => {
+                                                                setFlipped(!flipped);
+                                                            }}
                                                             sx={{
-                                                                textAlign: "center",
-                                                                fontWeight: 900,
-                                                                fontSize: 22,
-                                                                padding: 6,
+                                                                display: "flex",
+                                                                alignItems: "center",
+                                                                height: 350,
+                                                                backgroundColor: "#F3F0F6",
+                                                                m: 1,
+                                                                borderRadius: 2,
+                                                                boxShadow: 1,
                                                             }}
                                                         >
-                                                            {/* replace() takes out dates and important times when answering questions */}
-                                                            {res.definition}
-                                                        </Typography>
-                                                    </motion.div>
-                                                </Box>
-                                            </ReactCardFlip>
+                                                            <div className="mx-10 max-w text-center">
+
+                                                                <h2 className="bg-gradient-to-br from-black to-black bg-clip-text font-display text-xl font-bold text-transparent md:text-3xl md:font-normal">
+                                                                    {/* replace() takes out dates and important times when answering questions */}
+                                                                    {res.definition}
+                                                                </h2>
+                                                            </div>
+                                                        </Box>}</>}
                                         </Box>
                                     ))}
                                 </Carousel>
                             </Box>
                         </Box>
                     </motion.div>
-                    <div
-                        className="mx-3 my-2 flex animate-fade-up justify-center space-x-5 opacity-0"
-                        style={{ animationDelay: "0.3s", animationFillMode: "forwards" }}
-                    >                    <button onClick={saveFlashcardHandler} className="flex w-40 items-center justify-center rounded-md border border-gray-300 px-3 py-2 transition-all duration-75 hover:border-gray-800 focus:outline-none active:bg-gray-100">
-                            <p className="text-gray-600">Save</p>
-                        </button>
-                        <button onClick={() => { setFlashcards([]) }} className="flex w-40 items-center justify-center rounded-md border border-gray-300 px-3 py-2 transition-all duration-75 hover:border-gray-800 focus:outline-none active:bg-gray-100">
-                            <p className="text-gray-600">Cancel</p>
-                        </button>
-                    </div>
+                    {session ?
+                        <div
+                            className="mx-3 my-2 flex animate-fade-up justify-center space-x-5 opacity-0"
+                            style={{ animationDelay: "0.3s", animationFillMode: "forwards" }}
+                        >
+                            <button onClick={saveFlashcardHandler} className="flex w-40 items-center justify-center rounded-md border border-gray-300 px-3 py-2 transition-all duration-75 hover:border-gray-800 focus:outline-none active:bg-gray-100">
+                                <p className="text-gray-600">Save</p>
+                            </button>
+                            <button onClick={() => { setFlashcards([]) }} className="flex w-40 items-center justify-center rounded-md border border-gray-300 px-3 py-2 transition-all duration-75 hover:border-gray-800 focus:outline-none active:bg-gray-100">
+                                <p className="text-gray-600">New Set</p>
+                            </button>
+                        </div> :
+                        <div
+                            className="mx-3 my-2 flex animate-fade-up justify-center space-x-5 opacity-0"
+                            style={{ animationDelay: "0.3s", animationFillMode: "forwards" }}
+                        >
+                            <button onClick={() => setShowSignInModal(true)} className="flex w-40 items-center justify-center rounded-md border border-gray-300 px-3 py-2 transition-all duration-75 hover:border-gray-800 focus:outline-none active:bg-gray-100">
+                                <p className="text-gray-600">Try it out!</p>
+                            </button>
+                        </div>}
                 </Box>
             )}
 
