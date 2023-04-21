@@ -5,7 +5,7 @@ import Nav from "@/components/layout/nav";
 import Footer from "@/components/layout/footer";
 import { Suspense } from "react";
 export const metadata = {
-  title: "FlashcardX - Improving the quality of education and help make studying more efficient and engaging.",
+  title: "FlashcardX - Making studying more efficient and engaging.",
   description:
     "The future of studying is here with FlashcardX use AI to help you create study material so you can ace your next test!",
   twitter: {
