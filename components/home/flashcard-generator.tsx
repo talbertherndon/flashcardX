@@ -1,5 +1,5 @@
 "use client";
-import { Box, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import LinearProgress, {
     linearProgressClasses,
@@ -13,10 +13,11 @@ import ReactCardFlip from "react-card-flip";
 import { data } from "@/lib/mock/terms";
 import Carousel from "react-material-ui-carousel";
 import { type } from "os";
-import { generateFlaschards, saveFlaschards } from "@/lib/api";
+import { generateFlaschards, getFlaschard, getMyFlashcards, saveFlaschards } from "@/lib/api";
 import { Session } from "next-auth";
 import { useSignInModal } from "../layout/sign-in-modal";
 import { useWindowSize } from 'usehooks-ts'
+import { useRouter } from "next/navigation";
 
 
 
@@ -38,8 +39,10 @@ interface IFlashcard {
     definition: string
 }
 
-export default function FlashcardGenerator({ session }: { session: any }) {
+export default function FlashcardGenerator({ session, id }: { session: any, id: number }) {
     const { SignInModal, setShowSignInModal } = useSignInModal();
+
+    const router = useRouter();
     const { width } = useWindowSize()
     const [text, setText] = useState("");
     const [limit, setLimit] = useState(false);
@@ -47,8 +50,11 @@ export default function FlashcardGenerator({ session }: { session: any }) {
     const [word, setWord] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const [count, setCount] = useState(0)
+
     const [progress, setProgress] = useState(0);
-    const [flashcards, setFlashcards] = useState<IFlashcard[]>([]);
+    const [flashcards, setFlashcards] = useState<IFlashcard[]>(data);
+    const [set, setSet] = useState()
     const [flipped, setFlipped] = useState(false);
 
     async function generateFlashcardsHandler() {
@@ -83,7 +89,22 @@ export default function FlashcardGenerator({ session }: { session: any }) {
     }
 
     useEffect(() => {
-        setFlashcards(data);
+        setLoading(true)
+        if (id) {
+            getFlaschard(id).then((res) => {
+                console.log(res)
+                setLoading(false)
+                setFlashcards(res.data.flashcards)
+                setSet(res.data)
+            })
+        } else {
+            setLoading(false)
+            setFlashcards([]);
+        }
+        getMyFlashcards(session?.user.id).then((res) => {
+            console.log(res.data)
+            setCount(res.data.length)
+        })
     }, []);
 
     useEffect(() => {
@@ -119,9 +140,24 @@ export default function FlashcardGenerator({ session }: { session: any }) {
             })
         }
     }
+    function newFlashcardHandler() {
+        setFlashcards([]);
+        router.push("/")
+
+    }
     return (
         <div className="relative h-full w-full">
             <SignInModal />
+            {set &&
+                <p
+                    className="animate-fade-up text-center text-gray-500 opacity-0 md:text-md"
+                    style={{
+                        animationDelay: "0.25s",
+                        animationFillMode: "forwards",
+                    }}
+                >
+                    {set.name}
+                </p>}
             {flashcards.length == 0 ? (
                 <motion.div
                     animate={{
@@ -262,105 +298,122 @@ export default function FlashcardGenerator({ session }: { session: any }) {
                                     }}
                                 >
                                     {flashcards.map((res: any, index: number) => (
-                                        <Box sx={{ '&:hover': { cursor: 'grab' } }} key={index}>
-                                            {width > 450 ?
-                                                <ReactCardFlip isFlipped={flipped} flipDirection="vertical">
-                                                    <Box
-                                                        onClick={() => {
-                                                            setFlipped(!flipped);
-                                                        }}
-                                                        sx={{
-                                                            display: "flex",
-                                                            height: 350,
-                                                            alignItems: "center",
-                                                            justifyContent: "center",
-                                                            m: 1,
-                                                            borderRadius: 2,
-                                                            boxShadow: 1,
-                                                        }}
-                                                    >
-                                                        <motion.div
-                                                            animate={{ y: 10, scale: 1 }}
-                                                            //   transition={{ delay: `${index}` }}
-                                                            initial={{ scale: 0 }}
-                                                        >
-                                                            <div className="mx-10 max-w text-center">
-                                                                <h2 className="bg-gradient-to-br from-black to-black bg-clip-text font-display text-xl font-bold text-transparent md:text-3xl md:font-normal">
-                                                                    {res.term.replace(/\d+/g, "").replace(".", "")}</h2>
-                                                            </div>
-                                                        </motion.div>
-                                                    </Box>
-                                                    <Box
-                                                        onClick={() => {
-                                                            setFlipped(!flipped);
-                                                        }}
-                                                        sx={{
-                                                            display: "flex",
-                                                            alignItems: "center",
-                                                            height: 350,
-                                                            backgroundColor: "#F3F0F6",
-                                                            m: 1,
-                                                            borderRadius: 2,
-                                                            boxShadow: 1,
-                                                        }}
-                                                    >
-                                                        <motion.div
-                                                            animate={{ y: 10, scale: 1 }}
-                                                            initial={{ scale: 0 }}
-                                                        >
-                                                            <div className="mx-10 max-w text-center">
+                                        <>
+                                            {!loading ?
+                                                <Box sx={{ '&:hover': { cursor: 'grab' } }} key={index}>
+                                                    {width > 450 ?
+                                                        <ReactCardFlip isFlipped={flipped} flipDirection="vertical">
+                                                            <Box
+                                                                onClick={() => {
+                                                                    setFlipped(!flipped);
+                                                                }}
+                                                                sx={{
+                                                                    display: "flex",
+                                                                    height: 350,
+                                                                    alignItems: "center",
+                                                                    justifyContent: "center",
+                                                                    m: 1,
+                                                                    borderRadius: 2,
+                                                                    boxShadow: 1,
+                                                                }}
+                                                            >
+                                                                <motion.div
+                                                                    animate={{ y: 10, scale: 1 }}
+                                                                    //   transition={{ delay: `${index}` }}
+                                                                    initial={{ scale: 0 }}
+                                                                >
+                                                                    <div className="mx-10 max-w text-center">
+                                                                        <h2 className="bg-gradient-to-br from-black to-black bg-clip-text font-display text-xl font-bold text-transparent md:text-3xl md:font-normal">
+                                                                            {res.term.replace(/\d+/g, "").replace(".", "")}</h2>
+                                                                    </div>
+                                                                </motion.div>
+                                                            </Box>
+                                                            <Box
+                                                                onClick={() => {
+                                                                    setFlipped(!flipped);
+                                                                }}
+                                                                sx={{
+                                                                    display: "flex",
+                                                                    alignItems: "center",
+                                                                    height: 350,
+                                                                    backgroundColor: "#F3F0F6",
+                                                                    m: 1,
+                                                                    borderRadius: 2,
+                                                                    boxShadow: 1,
+                                                                }}
+                                                            >
+                                                                <motion.div
+                                                                    animate={{ y: 10, scale: 1 }}
+                                                                    initial={{ scale: 0 }}
+                                                                >
+                                                                    <div className="mx-10 max-w text-center">
 
-                                                                <h2 className="bg-gradient-to-br from-black to-black bg-clip-text font-display text-xl font-bold text-transparent md:text-3xl md:font-normal">
-                                                                    {/* replace() takes out dates and important times when answering questions */}
-                                                                    {res.definition}
-                                                                </h2>
-                                                            </div>
-                                                        </motion.div>
-                                                    </Box>
-                                                </ReactCardFlip> : <>
-                                                    {!flipped ?
-                                                        <Box
-                                                            onClick={() => {
-                                                                setFlipped(!flipped);
-                                                            }}
-                                                            sx={{
-                                                                display: "flex",
-                                                                height: 350,
-                                                                alignItems: "center",
-                                                                justifyContent: "center",
-                                                                m: 1,
-                                                                borderRadius: 2,
-                                                                boxShadow: 1,
-                                                            }}
-                                                        >
-                                                            <div className="mx-10 max-w text-center">
-                                                                <h2 className="bg-gradient-to-br from-black to-black bg-clip-text font-display text-xl font-bold text-transparent md:text-3xl md:font-normal">
-                                                                    {res.term.replace(/\d+/g, "").replace(".", "")}</h2>
-                                                            </div>
-                                                        </Box> :
-                                                        <Box
-                                                            onClick={() => {
-                                                                setFlipped(!flipped);
-                                                            }}
-                                                            sx={{
-                                                                display: "flex",
-                                                                alignItems: "center",
-                                                                height: 350,
-                                                                backgroundColor: "#F3F0F6",
-                                                                m: 1,
-                                                                borderRadius: 2,
-                                                                boxShadow: 1,
-                                                            }}
-                                                        >
-                                                            <div className="mx-10 max-w text-center">
+                                                                        <h2 className="bg-gradient-to-br from-black to-black bg-clip-text font-display text-xl font-bold text-transparent md:text-3xl md:font-normal">
+                                                                            {/* replace() takes out dates and important times when answering questions */}
+                                                                            {res.definition}
+                                                                        </h2>
+                                                                    </div>
+                                                                </motion.div>
+                                                            </Box>
+                                                        </ReactCardFlip>
+                                                        :
+                                                        <>
+                                                            {!flipped ?
+                                                                <Box
+                                                                    onClick={() => {
+                                                                        setFlipped(!flipped);
+                                                                    }}
+                                                                    sx={{
+                                                                        display: "flex",
+                                                                        height: 350,
+                                                                        alignItems: "center",
+                                                                        justifyContent: "center",
+                                                                        m: 1,
+                                                                        borderRadius: 2,
+                                                                        boxShadow: 1,
+                                                                    }}
+                                                                >
+                                                                    <div className="mx-10 max-w text-center">
+                                                                        <h2 className="bg-gradient-to-br from-black to-black bg-clip-text font-display text-xl font-bold text-transparent md:text-3xl md:font-normal">
+                                                                            {res.term.replace(/\d+/g, "").replace(".", "")}</h2>
+                                                                    </div>
+                                                                </Box> :
+                                                                <Box
+                                                                    onClick={() => {
+                                                                        setFlipped(!flipped);
+                                                                    }}
+                                                                    sx={{
+                                                                        display: "flex",
+                                                                        alignItems: "center",
+                                                                        height: 350,
+                                                                        backgroundColor: "#F3F0F6",
+                                                                        justifyContent: 'center',
+                                                                        m: 1,
+                                                                        borderRadius: 2,
+                                                                        boxShadow: 1,
+                                                                    }}
+                                                                >
+                                                                    <div className="mx-10 max-w text-center">
 
-                                                                <h2 className="bg-gradient-to-br from-black to-black bg-clip-text font-display text-xl font-bold text-transparent md:text-3xl md:font-normal">
-                                                                    {/* replace() takes out dates and important times when answering questions */}
-                                                                    {res.definition}
-                                                                </h2>
-                                                            </div>
-                                                        </Box>}</>}
-                                        </Box>
+                                                                        <h2 className="bg-gradient-to-br from-black to-black bg-clip-text font-display text-xl font-bold text-transparent md:text-3xl md:font-normal">
+                                                                            {/* replace() takes out dates and important times when answering questions */}
+                                                                            {res.definition}
+                                                                        </h2>
+                                                                    </div>
+                                                                </Box>
+                                                            }
+                                                        </>
+                                                    }
+                                                </Box> : <Box sx={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: 'center',
+                                                    height: 350,
+                                                }}>
+                                                    <CircularProgress sx={{
+
+                                                    }} /></Box>}
+                                        </>
                                     ))}
                                 </Carousel>
                             </Box>
@@ -371,12 +424,13 @@ export default function FlashcardGenerator({ session }: { session: any }) {
                             className="mx-3 my-2 flex animate-fade-up justify-center space-x-5 opacity-0"
                             style={{ animationDelay: "0.3s", animationFillMode: "forwards" }}
                         >
-                            {/* <button onClick={saveFlashcardHandler} className="flex w-40 items-center justify-center rounded-md border border-gray-300 px-3 py-2 transition-all duration-75 hover:border-gray-800 focus:outline-none active:bg-gray-100">
-                                <p className="text-gray-600">Save</p>
-                            </button> */}
-                            <button onClick={() => { setFlashcards([]) }} className="flex w-40 items-center justify-center rounded-md border border-gray-300 px-3 py-2 transition-all duration-75 hover:border-gray-800 focus:outline-none active:bg-gray-100">
+                            {!id &&
+                                <button onClick={saveFlashcardHandler} className="flex w-40 items-center justify-center rounded-md border border-gray-300 px-3 py-2 transition-all duration-75 hover:border-gray-800 focus:outline-none active:bg-gray-100">
+                                    <p className="text-gray-600">Save</p>
+                                </button>}
+                            {count <= 7 && <button onClick={newFlashcardHandler} className="flex w-40 items-center justify-center rounded-md border border-gray-300 px-3 py-2 transition-all duration-75 hover:border-gray-800 focus:outline-none active:bg-gray-100">
                                 <p className="text-gray-600">New Set</p>
-                            </button>
+                            </button>}
                         </div> :
                         <div
                             className="mx-3 my-2 flex animate-fade-up justify-center space-x-5 opacity-0"
