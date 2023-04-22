@@ -43,15 +43,21 @@ Start the server
 
 ## Roadmap
 
-- 0.1.0 Beta
-    - Copy & Paste normal text to generate flashcards
-    - Flashcard parsing for 7 flashcards
-    - Cross platform
-- 0.2.0 Beta
-    - Upload various file types (pptx. , docs. and etc)
-- 0.3.0 Beta
-    - See saved flashcards and share with friends
-    - Public flashcard marketplace
+- 0.1.0 Alpha
+    - [x] Copy & Paste normal text to generate flashcards
+    - [x] Flashcard parsing for 7 flashcards
+    - [x] Cross platform
+- 0.2.0 Alpha
+    - [ ] Save/View Flashcards
+    - [ ] Edit/View Flashcards
+    - [ ] Manual Add Flashcards
+- 0.3.0 Alpha
+    - [ ] Upload various file types (pptx. , docs., audio, and etc)
+- 0.4.0 Alpha
+    - [ ] Add paywalls for credits 
+    - [ ] See saved flashcards and share with friends
+    - [ ] Public flashcard marketplace
+
 ## Demo
 
 Coming soon..
