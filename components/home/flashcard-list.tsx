@@ -2,9 +2,30 @@
 import { Session } from "next-auth";
 import { useEffect, useState } from 'react';
 import { getFlaschard, getMyFlashcards } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { configureAbly, useChannel } from "@ably-labs/react-hooks";
+
+
+configureAbly({
+    key: "Skazdw.ZqOX2g:kGG3M44jUA1aVJoaH3EtuMM131--kXfkP5u765_MhBU",
+    clientId: "quickstart",
+});
 
 export default function FlashcardList({ session }: { session: any }) {
+    console.log(session)
+    const [channel] = useChannel(`${session?.user.id}`, (message) => {
+        console.log(message.name);
+        if (message.name) {
+            getMyFlashcards(session.user.id).then((res) => {
+                console.log(res.data)
+                setSets(res.data)
+            })
+        }
+
+    });
     const [sets, setSets] = useState([])
+    const router = useRouter();
+
     useEffect(() => {
         if (session) {
             getMyFlashcards(session.user.id).then((res) => {
@@ -15,16 +36,19 @@ export default function FlashcardList({ session }: { session: any }) {
     }, [session])
 
     function getFlashcardSetHandler(id: number) {
-        getFlaschard(id).then((res) => {
-            console.log(res.data)
-        })
+        router.push(`/${id}`)
+        // getFlaschard(id).then((res) => {
+        //     console.log(res.data)
+        //     router.push(`/${id}`)
+        // })
+
 
     }
 
     return (
         <div>
             <div className="grid grid-cols-4 gap-4 p-4">
-                {sets.map((res:any) => {
+                {sets.map((res: any) => {
                     return (
                         <div key={res.id} onClick={() => {
                             getFlashcardSetHandler(res.id)
@@ -41,6 +65,11 @@ export default function FlashcardList({ session }: { session: any }) {
                     )
                 })}
 
+            </div>
+            <div>
+                {sets.length == 7 &&
+                    <p className="text-lg font-semibold text-slate-800">You have reached the max of set your can create</p>
+                }
             </div>
         </div>
     )

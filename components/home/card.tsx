@@ -7,12 +7,17 @@ export default function Card({
   description,
   demo,
   large,
+  data
 }: {
   title: string;
   description: string;
   demo: ReactNode;
   large?: boolean;
+  data?: number;
+  
 }) {
+
+  
   return (
     <div
       className={`relative col-span-1 h-100 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md ${large ? "md:col-span-2" : ""
