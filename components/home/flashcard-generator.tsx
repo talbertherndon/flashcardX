@@ -38,6 +38,14 @@ interface IFlashcard {
     term: string;
     definition: string
 }
+interface ISet {
+    name: string;
+    flashcards: IFlashcard[];
+    id: number;
+    public: boolean;
+    user_id: number;
+    groups_id: number;
+}
 
 export default function FlashcardGenerator({ session, id }: { session: any, id: number }) {
     const { SignInModal, setShowSignInModal } = useSignInModal();
@@ -54,7 +62,7 @@ export default function FlashcardGenerator({ session, id }: { session: any, id: 
 
     const [progress, setProgress] = useState(0);
     const [flashcards, setFlashcards] = useState<IFlashcard[]>(data);
-    const [set, setSet] = useState()
+    const [set, setSet] = useState<ISet>()
     const [flipped, setFlipped] = useState(false);
 
     async function generateFlashcardsHandler() {

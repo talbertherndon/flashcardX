@@ -48,7 +48,7 @@ Start the server
     - [x] Flashcard parsing for 7 flashcards
     - [x] Cross platform
 - 0.2.0 Alpha
-    - [ ] Save/View Flashcards
+    - [x] Save/View Flashcards
     - [ ] Edit/View Flashcards
     - [ ] Manual Add Flashcards
 - 0.3.0 Alpha
