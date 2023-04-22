@@ -52,24 +52,33 @@ export default function FlashcardGenerator({ session }: { session: any }) {
     const [flipped, setFlipped] = useState(false);
 
     async function generateFlashcardsHandler() {
-        setLoading(true)
+        setError(false)
         console.log(text);
-        generateFlaschards(text).then((data) => {
-            console.log(data)
-            const answers = data.answers.split("\n");
-            const questions = data.questions.split("\n");
-            for (let i = 1; i < answers.length; i++) {
-                const tempObject = {
-                    definition: answers[i],
-                    term: questions[i],
-                }
-                console.log(tempObject)
-                setFlashcards((prev) => [...prev, tempObject])
+        if (text.length > 10 && text.length < 2501) {
+            setLoading(true)
+            generateFlaschards(text).then((data) => {
+                console.log(data)
+                const answers = data.answers.split("\n");
+                const questions = data.questions.split("\n");
+                for (let i = 1; i < answers.length; i++) {
+                    const tempObject = {
+                        definition: answers[i],
+                        term: questions[i],
+                    }
+                    console.log(tempObject)
+                    setFlashcards((prev) => [...prev, tempObject])
 
-            }
-            setProgress(0)
-            setLoading(false)
-        })
+                }
+                setProgress(0)
+                setLoading(false)
+            }).catch((e) => {
+                setLoading(false)
+                console.log(e)
+            })
+        } else {
+            console.log("Needs to be more then 10 characters")
+            setError(true)
+        }
 
     }
 
@@ -170,8 +179,8 @@ export default function FlashcardGenerator({ session }: { session: any }) {
                                 <></>
                             )}
                             {error ? (
-                                <Typography sx={{ color: "red" }}>
-                                    The word {word} is not allowed!
+                                <Typography sx={{ color: "red", fontSize: 12 }}>
+                                    Must be more then 10 characters or {word} is invalid!
                                 </Typography>
                             ) : (
                                 <></>
@@ -183,7 +192,7 @@ export default function FlashcardGenerator({ session }: { session: any }) {
                         >
                             {" "}
                             <button
-                            disabled={loading? true : false}
+                                disabled={loading ? true : false}
                                 onClick={generateFlashcardsHandler}
                                 className="group flex max-w-fit items-center justify-center space-x-2 rounded-full border border-black bg-black px-5 py-2 text-sm text-white transition-colors hover:bg-white hover:text-black"
                             >
@@ -253,7 +262,7 @@ export default function FlashcardGenerator({ session }: { session: any }) {
                                     }}
                                 >
                                     {flashcards.map((res: any, index: number) => (
-                                        <Box sx={{'&:hover':{cursor:'grab'}}} key={index}>
+                                        <Box sx={{ '&:hover': { cursor: 'grab' } }} key={index}>
                                             {width > 450 ?
                                                 <ReactCardFlip isFlipped={flipped} flipDirection="vertical">
                                                     <Box
