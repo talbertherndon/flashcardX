@@ -35,7 +35,7 @@ export default async function Home({ params }: { params: { id: string } }) {
                 >
                     <Twitter className="h-5 w-5 text-[#1d9bf0]" />
                     <p className="text-sm font-semibold text-[#1d9bf0]">
-                        Follow for more
+                        Follow for more credits!
                     </p>
                 </a>
                 <h1
@@ -107,11 +107,6 @@ export default async function Home({ params }: { params: { id: string } }) {
 }
 
 const features = [
-    // {
-    //   title: "FlashcardsX",
-    //   description:
-    //     "First, find",
-    // },
     {
         title: "Generate your flashcards",
         description:
@@ -131,47 +126,4 @@ const features = [
             <FlashList />
         </Suspense>
     },
-    // {
-    //   title: "One-click Deploy",
-    //   description:
-    //     "Jumpstart your next project by deploying Precedent to [Vercel](https://vercel.com/) in one click.",
-    //   demo: (
-    //     <a href={DEPLOY_URL}>
-    //       <Image
-    //         src="https://vercel.com/button"
-    //         alt="Deploy with Vercel"
-    //         width={120}
-    //         height={30}
-    //         unoptimized
-    //       />
-    //     </a>
-    //   ),
-    // },
-    // {
-    //   title: "Built-in Auth + Database",
-    //   description:
-    //     "Precedent comes with authentication and database via [Auth.js](https://authjs.dev/) + [Prisma](https://prisma.io/)",
-    //   demo: (
-    //     <div className="flex items-center justify-center space-x-20">
-    //       <Image alt="Auth.js logo" src="/authjs.webp" width={50} height={50} />
-    //       <Image alt="Prisma logo" src="/prisma.svg" width={50} height={50} />
-    //     </div>
-    //   ),
-    // },
-    // {
-    //   title: "Hooks, utilities, and more",
-    //   description:
-    //     "Precedent offers a collection of hooks, utilities, and `@vercel/og`",
-    //   demo: (
-    //     <div className="grid grid-flow-col grid-rows-3 gap-10 p-10">
-    //       <span className="font-mono font-semibold">useIntersectionObserver</span>
-    //       <span className="font-mono font-semibold">useLocalStorage</span>
-    //       <span className="font-mono font-semibold">useScroll</span>
-    //       <span className="font-mono font-semibold">nFormatter</span>
-    //       <span className="font-mono font-semibold">capitalize</span>
-    //       <span className="font-mono font-semibold">truncate</span>
-
-    //     </div>
-    //   ),
-    // },
 ];

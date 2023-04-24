@@ -9,7 +9,6 @@ import FlashList from '@/components/layout/flash-list'
 import { Suspense } from "react";
 
 export default async function Home() {
-
   const { stargazers_count: stars } = await fetch(
     "https://api.github.com/repos/steven-tey/precedent",
     {
