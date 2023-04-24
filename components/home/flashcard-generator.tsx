@@ -13,7 +13,7 @@ import ReactCardFlip from "react-card-flip";
 import { data } from "@/lib/mock/terms";
 import Carousel from "react-material-ui-carousel";
 import { type } from "os";
-import { generateFlaschards, getFlaschard, getMyFlashcards, saveFlaschards } from "@/lib/api";
+import { credits, deleteFlaschard, generateFlaschards, getFlaschard, getMyFlashcards, saveFlaschards } from "@/lib/api";
 import { Session } from "next-auth";
 import { useSignInModal } from "../layout/sign-in-modal";
 import { useWindowSize } from 'usehooks-ts'
@@ -57,7 +57,7 @@ export default function FlashcardGenerator({ session, id }: { session: any, id: 
     const [error, setError] = useState(false);
     const [word, setWord] = useState("");
     const [loading, setLoading] = useState(false);
-
+    const [message,setMessage] = useState('')
     const [count, setCount] = useState(0)
 
     const [progress, setProgress] = useState(0);
@@ -68,29 +68,45 @@ export default function FlashcardGenerator({ session, id }: { session: any, id: 
     async function generateFlashcardsHandler() {
         setError(false)
         console.log(text);
-        if (text.length > 10 && text.length < 2501) {
+        if (text.length > 20 && text.length < 2501) {
             setLoading(true)
-            generateFlaschards(text).then((data) => {
-                console.log(data)
-                const answers = data.answers.split("\n");
-                const questions = data.questions.split("\n");
-                for (let i = 1; i < answers.length; i++) {
-                    const tempObject = {
-                        definition: answers[i],
-                        term: questions[i],
-                    }
-                    console.log(tempObject)
-                    setFlashcards((prev) => [...prev, tempObject])
+            const payload = {
+                user_id: session.user.id,
+                cost: 150
+            }
+            credits(payload).then((res) => {
+                generateFlaschards(text).then((data) => {
+                    console.log(data)
+                    const answers = data.answers.split("\n");
+                    const questions = data.questions.split("\n");
+                    for (let i = 1; i < answers.length; i++) {
+                        const tempObject = {
+                            definition: answers[i],
+                            term: questions[i],
+                        }
+                        console.log(tempObject)
+                        setFlashcards((prev) => [...prev, tempObject])
 
-                }
-                setProgress(0)
-                setLoading(false)
+                    }
+                    setProgress(0)
+                    setLoading(false)
+                }).catch((e) => {
+                    //error generation
+                    setMessage('Server error please try again later')
+                    setError(true)
+                    setLoading(false)
+                    console.log(e)
+                })
             }).catch((e) => {
+                //out of credits
                 setLoading(false)
-                console.log(e)
+                setMessage(e.response.data.message)
+                console.log(e.response.data.message)
+                setError(true)
             })
         } else {
-            console.log("Needs to be more then 10 characters")
+            // not enough characters
+            setMessage("Needs to be more then 20 characters")
             setError(true)
         }
 
@@ -152,6 +168,14 @@ export default function FlashcardGenerator({ session, id }: { session: any, id: 
         setFlashcards([]);
         router.push("/")
 
+    }
+    function deleteFlashcardHandler() {
+        if (set) {
+            console.log(set)
+            deleteFlaschard(set.id).then((res) => {
+                router.push("/")
+            })
+        }
     }
     return (
         <div className="relative h-full w-full">
@@ -224,7 +248,7 @@ export default function FlashcardGenerator({ session, id }: { session: any, id: 
                             )}
                             {error ? (
                                 <Typography sx={{ color: "red", fontSize: 12 }}>
-                                    Must be more then 10 characters or {word} is invalid!
+                                   {message}
                                 </Typography>
                             ) : (
                                 <></>
@@ -438,6 +462,9 @@ export default function FlashcardGenerator({ session, id }: { session: any, id: 
                                 </button>}
                             {count <= 7 && <button onClick={newFlashcardHandler} className="flex w-40 items-center justify-center rounded-md border border-gray-300 px-3 py-2 transition-all duration-75 hover:border-gray-800 focus:outline-none active:bg-gray-100">
                                 <p className="text-gray-600">New Set</p>
+                            </button>}
+                            {set?.user_id == session.user.id && <button onClick={deleteFlashcardHandler} className="flex w-40 items-center justify-center rounded-md border border-gray-300 px-3 py-2 transition-all duration-75 hover:border-gray-800 focus:outline-none active:bg-gray-100">
+                                <p className="text-gray-600">Delete</p>
                             </button>}
                         </div> :
                         <div

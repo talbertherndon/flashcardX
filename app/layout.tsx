@@ -4,6 +4,8 @@ import { sfPro, inter } from "./fonts";
 import Nav from "@/components/layout/nav";
 import Footer from "@/components/layout/footer";
 import { Suspense } from "react";
+import mixpanel from "mixpanel-browser";
+
 export const metadata = {
   title: "FlashcardX - Making studying more efficient and engaging.",
   description:
