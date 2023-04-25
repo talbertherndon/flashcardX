@@ -26,6 +26,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+
   return (
     <html lang="en">
       <body className={cx(sfPro.variable, inter.variable)}>
