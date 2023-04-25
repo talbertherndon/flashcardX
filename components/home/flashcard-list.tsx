@@ -16,7 +16,7 @@ export default function FlashcardList({ session }: { session: any }) {
     const [channel] = useChannel(`${session?.user.id}`, (message) => {
         console.log(message.name);
         if (message.name) {
-            getMyFlashcards(session.user.id).then((res) => {
+            getMyFlashcards(session?.user.id).then((res) => {
                 console.log(res.data)
                 setSets(res.data)
             })
@@ -45,8 +45,7 @@ export default function FlashcardList({ session }: { session: any }) {
 
     return (
         <div>
-                 <p className="text-lg font-semibold text-slate-800 p-4">
-                {session.user.credits} Credits Left</p>
+            <p className="text-lg font-semibold text-slate-800 p-4">{session?.user.credits} Credits Left</p>
             <div className="grid grid-cols-4 gap-4 p-4">
                 {sets.map((res: any) => {
                     return (
