@@ -108,7 +108,7 @@ const features = [
   {
     title: "Generate your flashcards",
     description:
-      "Enter a web link or a short promot (Article, Textbook, etc) to create vocabular words to study.",
+      "Enter a short promot (Article, Textbook, etc) to create vocabular words to study... URLS not supported!",
     large: true,
     demo: <Suspense fallback="...">
             {/* @ts-expect-error Server Component */}
