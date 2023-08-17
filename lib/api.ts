@@ -1,8 +1,25 @@
 import axios from "axios";
 import { BASE_URL } from "./constants";
 import { Configuration, OpenAIApi } from "openai";
+
+import { z } from "zod";
+import { OpenAI } from "langchain/llms/openai";
+import { ChatOpenAI } from "langchain/chat_models/openai";
+import { LLMChain } from "langchain/chains";
+import {
+  StructuredOutputParser,
+  OutputFixingParser,
+} from "langchain/output_parsers";
+
 import mixpanel from "mixpanel-browser";
+import { PromptTemplate } from "langchain";
 mixpanel.init("d7fde14f85af300c3f01174f74590788", { debug: true });
+
+const llm = new ChatOpenAI({
+  openAIApiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+  modelName: "gpt-4",
+  temperature: 0,
+});
 
 const configuration = new Configuration({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
@@ -77,42 +94,41 @@ export async function credits(payload: any) {
 export async function generateFlaschards(user_input: string) {
   mixpanel.track("Helped Flashcards Assignment");
 
-  console.log(user_input);
-  const response = await openai.createCompletion({
-    model: "text-davinci-002",
-    prompt: `We are creating flashcards from the infomation below:\n${user_input}\nCreate 7 key terms from above:\n1.`,
-    temperature: 0,
-    max_tokens: 200,
-    top_p: 1,
-    frequency_penalty: 0,
-    presence_penalty: 0,
-  });
-  const ansewerPrompt = `${response.data.choices[0].text}\nDefine the 7 key terms:\n1.`;
-
-  const answers = await openai
-    .createCompletion({
-      model: "text-davinci-002",
-      prompt: ansewerPrompt,
-      temperature: 0,
-      max_tokens: 256,
-      top_p: 1,
-      frequency_penalty: 0,
-      presence_penalty: 1.5,
-    })
-    .then((res) => {
-      return res;
-    });
-  // console.log(response);
-  // console.log(answers);
-  console.log(
-    `We are creating flashcards from the infomation below:\n${user_input}\nList 7 key words from above:\n1.`,
-    response.data.choices[0].text,
-    `\nDefine the vocabulary words:\n1.`,
-    answers.data.choices[0].text,
+  const outputParser = StructuredOutputParser.fromZodSchema(
+    z
+      .array(
+        z.object({
+          term: z.string().describe("The key term"),
+          definition: z.string().describe("The key term's definition"),
+        }),
+      )
+      .describe("An array of Terms and Definition about the topic."),
   );
-  return {
-    questions: "\n1." + response.data.choices[0].text,
-    answers: "\n1." + answers.data.choices[0].text,
-  };
+
+  const outputFixingParser = OutputFixingParser.fromLLM(llm, outputParser);
+
+  const prompt = new PromptTemplate({
+    template: `We are creating flashcards from the infomation,${user_input}:\n{format_instructions}\n{query}`,
+    inputVariables: ["query"],
+    partialVariables: {
+      format_instructions: outputFixingParser.getFormatInstructions(),
+    },
+  });
+
+  const answerFormattingChain = new LLMChain({
+    llm,
+    prompt,
+    outputKey: "records",
+    outputParser: outputFixingParser,
+  });
+
+  console.log(user_input);
+
+  const result = await answerFormattingChain.call({
+    query: "List 12 terms",
+  });
+  const flashcards = result.records
+
+  return flashcards;
 }
 //

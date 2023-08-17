@@ -77,17 +77,18 @@ export default function FlashcardGenerator({ session, id }: { session: any, id: 
             credits(payload).then((res) => {
                 generateFlaschards(text).then((data) => {
                     console.log(data)
-                    const answers = data.answers.split("\n");
-                    const questions = data.questions.split("\n");
-                    for (let i = 1; i < answers.length; i++) {
-                        const tempObject = {
-                            definition: answers[i],
-                            term: questions[i],
-                        }
-                        console.log(tempObject)
-                        setFlashcards((prev) => [...prev, tempObject])
+                    setFlashcards(data);
+                    // const answers = data.answers.split("\n");
+                    // const questions = data.questions.split("\n");
+                    // for (let i = 1; i < answers.length; i++) {
+                    //     const tempObject = {
+                    //         definition: answers[i],
+                    //         term: questions[i],
+                    //     }
+                    //     console.log(tempObject)
+                    //     setFlashcards((prev) => [...prev, tempObject])
 
-                    }
+                    // }
                     setProgress(0)
                     setLoading(false)
                 }).catch((e) => {
